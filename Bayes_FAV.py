@@ -62,7 +62,7 @@ class Bayes_FAV():
             
 
     """
-    colnames =['dVAPH','dWH','dOH','dOAU','dAWU','dOWU','LogKOA','LogKOW','LogKAW','LogPL','LogSW','LogSO','dfusS','Tm']
+    colnames =['dVAPH','dWU','dOU','dOAU','dAWU','dOWU','LogKOA','LogKOW','LogKAW','LogPL','LogSW','LogSO','dfusS','Tm']
     def __init__(self,LDVs,startcol = 3,colnames = colnames):
         #Initialize the data. This will take the input dataframe and combine the nominal values
         #and standard deviations using the uncertainties package
@@ -101,6 +101,10 @@ class Bayes_FAV():
             res.loc[res.LogPL==0,'LogSA'] = np.nan #Convert zeros to nan
             #Here we will also convert the wet octanol partition coefficient to dry so that we are all on the same page
             res.loc[:,'LogKOWd'] = 1.35*res.LogKOW - 1.58
+            #convert to internal energy of phase change (dU) rather than enthalpies (dH) (see Goss 1996 DOI 10.1021/es950508f) using rel.
+            #found by Beyer et al. (2002) for PCBs, namely dAU = dvapH - 2,391 J/mol. Like Beyer, we will assume that all enthalpies of
+            #phase change in the water phase are actually internal energies, as they were measured volumetrically.
+            res.loc[:,'LogdUA'] = res.dVAPH - 2391
             res.loc[res.LogKOW==0,'LogKOWd'] = np.nan #Convert zeros to nan
             res = res.replace(0,np.nan) #Convert all zeros to nans for the next part
             res = LDVs
